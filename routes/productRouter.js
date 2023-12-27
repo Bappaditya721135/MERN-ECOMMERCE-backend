@@ -1,5 +1,5 @@
 import express from "express";
-import { createProduct, deleteProduct, getAllProducts, updateProduct } from "../controller/productController.js";
+import { createProduct, deleteProduct, getAllProducts, getProductDetails, updateProduct } from "../controller/productController.js";
 
 
 export const productRouter = express.Router();
@@ -17,4 +17,4 @@ productRouter.route("/product/new").post(createProduct);
 
 
 // UPDATE PRODUCT --Admin Route 
-productRouter.route("/product/:id").put(updateProduct).delete(deleteProduct);
+productRouter.route("/product/:id").get(getProductDetails).put(updateProduct).delete(deleteProduct);
