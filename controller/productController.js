@@ -16,7 +16,7 @@ export const createProduct = async (req, res, next) => {
             product,
         })
     } catch (error) {
-        console.error(error);
+        next(error);
     }
 }
 
@@ -33,7 +33,7 @@ export const getAllProducts = async (req, res, next) => {
             products,
         })
     } catch (error) {
-        console.error(error);
+        next(error);
     }
 }
 
@@ -52,7 +52,7 @@ export const getProductDetails = async (req, res, next) => {
             product,
         })
     } catch (error) {
-        console.error(error);
+        next(error);
     }
 }
 
@@ -75,7 +75,7 @@ export const updateProduct = async (req, res) => {
             product,
         })
     } catch (error) {
-        console.error(error);
+        next(error);
     }
 }
 
@@ -97,6 +97,6 @@ export const deleteProduct = async (req, res) => {
             "message": "product deleted successfully"
         })
     } catch (error) {
-        console.error(error);
+        next(error);
     }
 }
