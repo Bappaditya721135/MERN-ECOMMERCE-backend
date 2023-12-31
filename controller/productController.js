@@ -25,8 +25,11 @@ export const createProduct = async (req, res, next) => {
 
 // GET ALL PRODUCT 
 export const getAllProducts = async (req, res, next) => {
+    // BASIC PAGINATION 
+    const page = req.query.page || 1;
+    const maxProductPerPage = 3;
     try {
-        const products = await Product.find(productFilter(req.query));
+        const products = await Product.find(productFilter(req.query)).limit(maxProductPerPage).skip(maxProductPerPage * (page - 1));
         if(!products) {
             return next(new ErrorHandle("you don't have any products", 404));
         }
