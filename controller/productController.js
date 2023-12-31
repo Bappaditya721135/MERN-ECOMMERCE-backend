@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 // PRODUCT MODEL 
 import { Product } from "../models/productModel.js";
 import ErrorHandler from "../utils/errorHandlerClass.js";
+// FILTER API FEATURE 
+import { productFilter } from "../utils/productApiFeatures.js";
 
 
 // CREATE PRODUCT --Admin Route
@@ -24,7 +26,7 @@ export const createProduct = async (req, res, next) => {
 // GET ALL PRODUCT 
 export const getAllProducts = async (req, res, next) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find(productFilter(req.query));
         if(!products) {
             return next(new ErrorHandle("you don't have any products", 404));
         }
