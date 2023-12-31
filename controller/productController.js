@@ -28,6 +28,7 @@ export const getAllProducts = async (req, res, next) => {
     // BASIC PAGINATION 
     const page = req.query.page || 1;
     const maxProductPerPage = 3;
+    const countDocument = await Product.countDocuments();
     try {
         const products = await Product.find(productFilter(req.query)).limit(maxProductPerPage).skip(maxProductPerPage * (page - 1));
         if(!products) {
@@ -36,6 +37,7 @@ export const getAllProducts = async (req, res, next) => {
         res.status(201).json({
             "success": true,
             products,
+            countDocument,
         })
     } catch (error) {
         next(error);
