@@ -25,14 +25,15 @@ export const registerUser = async (req, res, next) => {
 export const loginUser = async (req, res, next) => {
     try {
         const { email, password } = req.body;
+        if(!email || !password) return next(new ErrorHandler("enter email & password", 400))
         const user = await UserModel.findOne({email}).select("+password")
 
         // USER NOT FOUND 
         if(!user) return next(new ErrorHandler("can not find user", 404));
 
         // CHECK IF THE PASSWORD MATCH 
-        const matchPassword = await bcrypt.compare(password, user.password);
-        if(!matchPassword) return next(new ErrorHandler("invalid email or password", 400));
+        const isPasswordCorrect = await user.comparePassword(password);
+        if(!isPasswordCorrect) return next(new ErrorHandler("invalid email or password", 400));
         
         // SEND COOKIE 
         sendCookie(user,201, res);

@@ -7,7 +7,7 @@ export const sendCookie = (user, statusCode, res) => {
         maxAge: process.env.MAX_AGE,
     }
 
-    const token = jwt.sign({id: user._id}, process.env.JWT_SECRECT_KEY);
+    const token = user.getJWTToken();
     res.status(statusCode).cookie("token", token, cookieOption).json({
         success: true,
         user,
