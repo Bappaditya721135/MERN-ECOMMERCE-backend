@@ -1,5 +1,6 @@
 import express from "express";
 import { createProduct, deleteProduct, getAllProducts, getProductDetails, updateProduct } from "../controller/productController.js";
+import { isAuthenticated } from "../middleware/isAuth.js";
 
 
 export const productRouter = express.Router();
@@ -9,7 +10,7 @@ export const productRouter = express.Router();
 
 
 // GET ALL PRODUCT ROUTES 
-productRouter.route("/product").get(getAllProducts);
+productRouter.route("/product").get(isAuthenticated, getAllProducts);
 
 
 // CREATE PRODUCT ROUTE -- Admin route
