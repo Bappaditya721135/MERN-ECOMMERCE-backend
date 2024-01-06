@@ -58,3 +58,38 @@ export const logoutUser = (req, res, next) => {
       next(error);  
     }
 }
+
+
+// FORGOR PASSWORD 
+export const forgotPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        const user = await UserModel.findOne({ email });
+        // CHECK IF USER EXIST 
+        if(!user) {
+            return next(new ErrorHandler("user not exist", 404));
+        }
+
+        const resetToken = user.getResetPasswordToken();
+        const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/reset-password/${resetToken}`;
+        console.log(resetPasswordUrl);
+        res.send("forgot password");
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+// RESET PASSWORD 
+
+export const resetPassword = async (req, res, next) => {
+    try {
+        const { token } = req.params;
+        const { password } = req.body;
+        console.log(password);
+        console.log(token);
+        res.send("reset password"); 
+    } catch (error) {
+        next(error);
+    }
+}
