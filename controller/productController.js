@@ -9,6 +9,8 @@ import { productFilter } from "../utils/productApiFeatures.js";
 // CREATE PRODUCT --Admin Route
 export const createProduct = async (req, res, next) => {
     try {
+        // ASIGNING USER ID IN REQ.BODY.USER FEILD 
+        req.body.user = req.user._id;
         const product = await Product.create(req.body);
         if(!product) {
             return next(new  ErrorHandler("some went wrong while creating your product", 500));
