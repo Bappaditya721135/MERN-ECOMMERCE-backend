@@ -2,6 +2,7 @@ import { UserModel } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import ErrorHandler from "../utils/errorHandlerClass.js";
+import crypto from "crypto";
 
 // SEND COOKIE UTILITY FUNCTION 
 import { sendCookie } from "../utils/sendCookie.js";
@@ -63,7 +64,6 @@ export const logoutUser = (req, res, next) => {
 
 // FORGOR PASSWORD 
 export const forgotPassword = async (req, res, next) => {
-    try {
         const { email } = req.body;
         const user = await UserModel.findOne({ email });
         // CHECK IF USER EXIST 
@@ -71,7 +71,9 @@ export const forgotPassword = async (req, res, next) => {
             return next(new ErrorHandler("user not exist", 404));
         }
 
+    try {
         const resetToken = user.getResetPasswordToken();
+        await user.save();
         const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/reset-password/${resetToken}`;
         const message = `please reset your password from this url:- ${resetPasswordUrl} if not requested from you ignore it`;
         await sendEamil({
@@ -84,21 +86,44 @@ export const forgotPassword = async (req, res, next) => {
             message: `reset token url sent to ${user.email}`
         })
     } catch (error) {
+        user.resetPasswordToken = undefined;
+        user.resetTokenExpire = undefined;
+        await user.save();
         next(error);
     }
 }
 
 
 // RESET PASSWORD 
-
 export const resetPassword = async (req, res, next) => {
     try {
         const { token } = req.params;
         const { password } = req.body;
-        console.log(password);
-        console.log(token);
-        res.send("reset password"); 
+        const encryptedToken = crypto.createHash("sha256").update(token).digest("hex");
+        const user = await UserModel.findOne({
+            resetPasswordToken: encryptedToken,
+            resetTokenExpire: {$gt: Date.now()}
+        });
+        // IF USER NOT FOUND 
+        if(!user) {
+            return next(new ErrorHandler("invalid reset token or reset token has expired", 400)); 
+        }
+
+        // IF PASSWORD AND CONFIRM PASSWORD NOT MATCHED 
+        if(req.body.password !== req.body.confirmPassword) {
+            return next(new ErrorHandler("password and confirmPassword do not match", 400));
+        }
+
+        user.password = password;
+        user.resetPasswordToken = undefined;
+        user.resetTokenExpire = undefined;
+        await user.save();
+        res.json({
+            success: true,
+            message: "password changed successfully",
+        })
     } catch (error) {
         next(error);
     }
 }
+// this is a reset password controller for reset password 

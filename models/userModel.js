@@ -37,17 +37,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "user"
     },
-    user: {
-        type: mongoose.Schema.ObjectId,
-        required: true,
-    },
     resetPasswordToken: String,
     resetTokenExpire: Date,
 })
 
 // ENCRYPT PASSWORD  
 userSchema.pre("save", async function (next) {
-    if(!user.isModifiet("password")) {
+    if(!this.isModified("password")) {
         return next();
     }
     this.password = await bcrypt.hash(this.password, 10)

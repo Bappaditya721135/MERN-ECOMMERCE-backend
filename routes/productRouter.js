@@ -11,12 +11,12 @@ export const productRouter = express.Router();
 
 
 // GET ALL PRODUCT ROUTES 
-productRouter.route("/product").get(isAuthenticated, isAuthorize("admin"), getAllProducts);
+productRouter.route("/product").get(getAllProducts);
 
 
 // CREATE PRODUCT ROUTE -- Admin route
-productRouter.route("/product/new").post(createProduct);
+productRouter.route("/product/new").post(isAuthenticated, isAuthorize("admin"), createProduct);
 
 
 // UPDATE PRODUCT --Admin Route 
-productRouter.route("/product/:id").get(getProductDetails).put(updateProduct).delete(deleteProduct);
+productRouter.route("/product/:id").get(getProductDetails).put(isAuthenticated, isAuthorize("admin"), updateProduct).delete(isAuthenticated, isAuthorize("admin"), deleteProduct);
