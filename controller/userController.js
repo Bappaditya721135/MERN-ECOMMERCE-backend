@@ -126,4 +126,106 @@ export const resetPassword = async (req, res, next) => {
         next(error);
     }
 }
-// this is a reset password controller for reset password 
+
+// CHANGE PASSWORD 
+export const changePassword = async (req, res, next) => {
+    try {
+        const { originalPassword, newPassword, confirmPassword } = req.body;
+        const user = await UserModel.findById(req.user._id).select("+password");
+        if(!user) {
+            return next(new ErrorHandler("user not found", 400));
+        }
+        // FIRST CHECK IF THE NEW PASSWORD AND CONFIRST PASSWORD ARE CORRECT BEFORE CHECKING THE ORIGINAL PASSWORD 
+        if(newPassword !== confirmPassword) {
+            return next(new ErrorHandler("Check new password and confirm password", 400));
+        }
+        // CHECK THE ORIGINAL PASSWORD 
+        if(!await bcrypt.compare(originalPassword, user.password)) {
+            return next(new ErrorHandler("Invalid credentials", 400));
+        }
+
+        // NOW CHANGE THE PASSWORD  
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "password changed successfully"
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+// GET ALL USER (--Admin)
+export const getAllUsers = async (req, res, next) => {
+    try {
+        const users = await UserModel.find();
+        if(!users) {
+            return next(new ErrorHandler("users not found", 400));
+        }
+        res.status(200).json({
+            success: true,
+            users,
+        })
+    } catch (error) {
+        next(error);
+    }
+} 
+
+
+// GET SINGLE USER (--Admin) 
+export const getSingleUser = async (req, res, next) => {
+    try {
+        const {id} = req.params;
+        const user = await UserModel.findById(id);
+        if(!user) {
+            return next(new ErrorHandler("user not found", 400));
+        }
+
+        res.status(200).json({
+            success: true,
+            user,
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+// UPDATE USER  (--Admin)
+export const updateUser = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const user = await UserModel.findByIdAndUpdate(id,req.body);
+        if(!user) {
+            return next(new ErrorHandler("user update request failed, check the id and req.body", 400))
+        }
+        res.status(200).json({
+            success: true,
+            user,
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+// DELETE USER (--Admin) 
+export const deleteUser = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const user = await UserModel.findByIdAndDelete(id);
+        if(!user) {
+            return next(new ErrorHandler("user not found", 400));
+        }
+        res.status(200).json({
+            success: true,
+            message: "user delete",
+            user
+        })
+    } catch (error) {
+        next(error);
+    }
+}
