@@ -109,3 +109,57 @@ export const deleteProduct = async (req, res) => {
         next(error);
     }
 }
+
+
+
+// CREATE REVIEW  
+export const createReview = async (req, res, next) => {
+    try {
+        const { productId } = req.params;
+        const userId = req.user._id;
+
+        // CREATE PRODUCT REVIEW 
+        const productReview = {
+            user: userId,
+            name: req.user.name,
+            ...req.body
+        }
+        const product = await Product.findById(productId);
+        if(!product) {
+            return next(new ErrorHandler("product not found", 400));
+        }
+        
+        // CHECK IF THE USER EXIST 
+        const userExist = product.reviews.find(rev => rev.user.toString() === userId.toString());
+        if(!userExist) {
+            product.reviews.push(productReview);
+            product.numOfReviews = product.numOfReviews + 1;
+        }
+        else {
+            product.reviews.forEach((rev, i) => {
+                if(rev.user.toString() === userId.toString()) {
+                    product.reviews[i] = productReview;
+                }
+            })
+        }
+
+
+        // CHANGE THE OVARAL RATING  
+        let avg = 0;
+        product.reviews.forEach(rev => {
+            avg = avg + rev.rating;
+        })
+        product.ratings = avg/product.reviews.length;
+        
+        // NOW SAVE THE REVIEW 
+        await product.save();
+
+        const message = userExist ? "review updated successfully" : "review addded successfully";
+        res.status(200).json({
+            success: true,
+            message,
+        })
+    } catch (error) {
+        next(error);
+    }
+}
