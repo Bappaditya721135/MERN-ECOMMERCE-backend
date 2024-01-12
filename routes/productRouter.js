@@ -1,5 +1,5 @@
 import express from "express";
-import { createProduct, createReview, deleteProduct, getAllProducts, getProductDetails, updateProduct } from "../controller/productController.js";
+import { createProduct, createReview, deleteProduct, deleteReview, getAllProducts, getAllReviews, getProductDetails, updateProduct } from "../controller/productController.js";
 import { isAuthenticated } from "../middleware/isAuthenticated.js";
 import { isAuthorize } from "../middleware/isAuthorize.js";
 
@@ -23,4 +23,7 @@ productRouter.route("/product/:id").get(getProductDetails).put(isAuthenticated, 
 
 
 // CREATE REVIEW 
-productRouter.route("/product/review/:productId").post(isAuthenticated, createReview);
+productRouter.route("/review").post(isAuthenticated, createReview);
+
+// GET ALL REVIEWS AND DELETE REVIEW 
+productRouter.route("/reviews").get(getAllReviews).delete(isAuthenticated, deleteReview);
