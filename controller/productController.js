@@ -234,3 +234,26 @@ export const getAllReviews = async (req, res, next) => {
         next(error);
     }
 }
+
+
+// DELETEE REVIEW 
+export const deleteReview = async (req, res, next) => {
+    try {
+        const { productId } = req.query;
+        const product = await Product.findById(productId);
+        if(!product) {
+            return next(new ErrorHandler("product not found", 404));
+        }
+        // FILTER THE USER REVIEW 
+        product.reviews = product.reviews.filter(rev => rev.user.toString() !== req.user._id.toString());
+
+        // NOW SAVE THE PRODUCT 
+        await product.save();
+        res.status(200).json({
+            success: true,
+            message: "review deleted successfully",
+        })
+    } catch (error) {
+       next(error); 
+    }
+}
