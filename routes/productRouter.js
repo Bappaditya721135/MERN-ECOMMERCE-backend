@@ -23,4 +23,4 @@ productRouter.route("/product/:id").get(getProductDetails).put(isAuthenticated, 
 
 
 // CREATE REVIEW 
-productRouter.route("/product/review/:productId").post(isAuthenticated, createReview);
+productRouter.route("/product/review").post(isAuthenticated, createReview);
