@@ -206,7 +206,30 @@ export const createReview = async (req, res, next) => {
         product.ratings = avg/product.reviews.length;
             
         await product.save();
-        res.send("create review");
+        const message = isReviewed ? "product updated successfully" : "product added successfully";
+        res.status(200).json({
+            success: true,
+            message,
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+// GET ALL REVIEWS OF PRODUCT  
+export const getAllReviews = async (req, res, next) => {
+    try {
+        const { productId } = req.query;
+        const product = await Product.findById(productId);
+        if(!product) {
+            return next(new ErrorHandler("product not found", 404));
+        }
+        const reviews = product.reviews;
+        res.status(200).json({
+            success: true,
+            reviews,
+        })
     } catch (error) {
         next(error);
     }
