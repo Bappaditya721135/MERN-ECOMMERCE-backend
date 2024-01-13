@@ -36,6 +36,7 @@ const orderSchema = new mongoose.Schema({
             },
             product: {
                 type: mongoose.Schema.Types.ObjectId,
+                ref: "Product",
                 required: [true, "product id is required"],
             },
             quantity: {
@@ -84,6 +85,7 @@ const orderSchema = new mongoose.Schema({
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "Users",
         required: [true, "user is required"],
     },
     orderStatus: {
