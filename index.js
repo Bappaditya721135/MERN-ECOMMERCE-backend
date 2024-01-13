@@ -1,8 +1,11 @@
 import express from "express";
 import dotenv from "dotenv";
+// DATABASE 
 import { connect_DB } from "./config/database.js";
+// ROUTERS 
 import { productRouter } from "./routes/productRouter.js";
 import { userRouter } from "./routes/userRouter.js";
+import { orderRouter } from "./routes/orderRouter.js";
 import { errorHandler } from "./middleware/error.js";
 import cookieParser from "cookie-parser";
 
@@ -33,7 +36,7 @@ app.use(cookieParser());
 app.use("/api/v1", productRouter);
 app.use("/api/v1", userRouter);
 
-
+app.use("/api/v1", orderRouter);
 // CONNECTING TO DATABASE 
 connect_DB();
 
