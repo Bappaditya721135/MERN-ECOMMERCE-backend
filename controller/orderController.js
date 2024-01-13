@@ -32,3 +32,39 @@ export const createNewOrder = async (req, res, next) => {
         next(error);
     }
 }
+
+
+// GET ORDER DETAILS FOR --Admin 
+export const getOrderDetails = async (req, res, next) => {
+    try {
+        const { orderId } = req.params;
+        const order = await Order.findById(orderId).populate("user", "name email");
+        if(!order) {
+            return next(new ErrorHandler("order not found", 404));
+        }
+
+        res.status(200).json({
+            success: true,
+            order,
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+// GET MY ORDER DETAILS 
+export const myOrder = async (req, res, next) => {
+    try {
+        const order = await Order.find({user: req.user._id});
+        if(!order) {
+            return next(new ErrorHandler("order not found", 404));
+        }
+        res.status(200).json({
+            success: true,
+            order,
+        })
+    } catch (error) {
+        next(error);
+    }
+}
