@@ -91,7 +91,7 @@ const orderSchema = new mongoose.Schema({
     orderStatus: {
         type: String,
         required: [true, "order status is required"],
-        default: "processing",
+        default: "Processing",
     },
     deleveredAt: Date,
     createdAt: {
