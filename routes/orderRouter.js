@@ -1,6 +1,6 @@
 import express from "express";
 // CONTROLLERS 
-import { createNewOrder, getAllOrders, getOrderDetails, myOrder, updateOrder } from "../controller/orderController.js";
+import { createNewOrder, deleteOrder, getAllOrders, getOrderDetails, myOrder, updateOrder } from "../controller/orderController.js";
 // MIDDLEWARRE 
 import { isAuthenticated } from "../middleware/isAuthenticated.js"
 import { isAuthorize } from "../middleware/isAuthorize.js";
@@ -24,7 +24,7 @@ orderRouter.route("/admin/orders").get(isAuthenticated, isAuthorize("admin"), ge
 
 
 // UPDATE AND DELETE ORDER FOR --Admin 
-orderRouter.route("/admin/order/:orderId").put(isAuthenticated, isAuthorize("admin"), updateOrder);
+orderRouter.route("/admin/order/:orderId").put(isAuthenticated, isAuthorize("admin"), updateOrder).delete(isAuthenticated, isAuthorize("admin"), deleteOrder);
 
 
 
