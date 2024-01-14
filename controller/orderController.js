@@ -1,5 +1,6 @@
 // MODEL 
 import { Order } from "../models/orderModel.js";
+import { Product } from "../models/productModel.js";
 import ErrorHandler from "../utils/errorHandlerClass.js";
 
 
@@ -83,5 +84,57 @@ export const getAllOrders = async (req, res, next) => {
         })
     } catch (error) {
         next(error);
+    }
+}
+
+
+// UPDATE ORDER FOR --Admin 
+export const updateOrder = async (req, res, next) => {
+    try {
+        const { orderId } = req.params;
+        const { orderStatus } = req.body;
+        const order = await Order.findById(orderId);
+        if(!order) {
+            return next(new ErrorHandler("order not found", 404));
+        }
+        // CHECK IF THE ORDER HAS ALREADY BEEN DELEVERED 
+        if(order.orderStatus === "Delevered") {
+            return next(new ErrorHandler("Order has already been delevered"));
+        }
+
+        // DONT UPDATE THE STOCKS IF THE PRODUCT IS ALREADY SHIPPED  
+        if(order.orderStatus === "Shipped" && orderStatus === "Shipped") {
+            return next(new ErrorHandler("product has already been shipped", 400));
+        }
+
+        order.orderStatus = orderStatus;
+
+        // ONLY UPDATE THE STOCKS WHEN PRODUCT IS SHIPPED
+        if(order.orderStatus === "Shipped") {
+            // NOW UPDATE THE STOCKS FOR EACH ORDERED ITEMS  
+            order.orderedItems.forEach(async (order) => {
+                await updateStocks(order.product, order.quantity);
+            })
+        }
+        order.save();
+        res.send("update order");
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+// UPDATE STOCKS FUNCTION 
+async function updateStocks(id, quantity) {
+    try {
+        const product = await Product.findById(id);
+        if(!product) {
+            return next(new ErrorHandler("product not found"));
+        } 
+        // NOW UPDATE THE PRODUCT STOCKS 
+        product.stocks -= quantity;
+        product.save();
+    } catch (error) {
+      next(error);  
     }
 }
