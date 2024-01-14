@@ -68,3 +68,20 @@ export const myOrder = async (req, res, next) => {
         next(error);
     }
 }
+
+
+// GET ALL ORDERS FOR --Admin 
+export const getAllOrders = async (req, res, next) => {
+    try {
+        const orders = await Order.find().populate("user", "name email");
+        if(!orders) {
+            return next(new ErrorHandler("orders not found", 404));
+        }
+        res.status(200).json({
+            success: true,
+            orders,
+        })
+    } catch (error) {
+        next(error);
+    }
+}
