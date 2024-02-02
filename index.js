@@ -27,6 +27,7 @@ dotenv.config({
 
 
 
+
 // MIDDLEWARE 
 app.use(express.json());
 app.use(cookieParser());
