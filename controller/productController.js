@@ -32,7 +32,7 @@ export const getAllProducts = async (req, res, next) => {
     const maxProductPerPage = 3;
     const countDocument = await Product.countDocuments();
     try {
-        const products = await Product.find(productFilter(req.query)).limit(maxProductPerPage).skip(maxProductPerPage * (page - 1));
+        const products = await Product.find(productFilter(req.query))
         if(!products) {
             return next(new ErrorHandle("you don't have any products", 404));
         }
