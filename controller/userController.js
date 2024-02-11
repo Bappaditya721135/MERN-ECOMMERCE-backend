@@ -45,6 +45,16 @@ export const loginUser = async (req, res, next) => {
 }
 
 
+// GET USER  
+export const getUser = (req, res, next) => {
+    try {
+        sendCookie(req.user, 201, res);
+    } catch (error) {
+        next(error)
+    }
+}
+
+
 // LOGOUT USER 
 export const logoutUser = (req, res, next) => {
     try {
