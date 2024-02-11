@@ -1,6 +1,6 @@
 import express from "express";
 // CONTROLLERS 
-import { loginUser, logoutUser, registerUser, forgotPassword, resetPassword, getAllUsers, getSingleUser, updateUser, deleteUser, changePassword } from "../controller/userController.js";
+import { loginUser, logoutUser, registerUser, forgotPassword, resetPassword, getAllUsers, getSingleUser, updateUser, deleteUser, changePassword, getUser } from "../controller/userController.js";
 import { isAuthenticated } from "../middleware/isAuthenticated.js"
 import { isAuthorize } from "../middleware/isAuthorize.js";
 
@@ -10,6 +10,8 @@ const userRouter = express.Router();
 userRouter.route("/register").post(registerUser);
 // USER LOGIN 
 userRouter.route("/login").post(loginUser);
+// GET USER 
+userRouter.route("/user/me").get(isAuthenticated, getUser);
 // USER LOGOUT  
 userRouter.route("/logout").get(logoutUser);
 // FORGOT PASSWORD 
