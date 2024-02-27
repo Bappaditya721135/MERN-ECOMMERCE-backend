@@ -1,15 +1,16 @@
 import mongoose from "mongoose";
-// PRODUCT MODEL 
+// PRODUCT MODEL
 import { Product } from "../models/productModel.js";
 import ErrorHandler from "../utils/errorHandlerClass.js";
-// FILTER API FEATURE 
+// FILTER API FEATURE
 import { productFilter } from "../utils/productApiFeatures.js";
+import { UserModel } from "../models/userModel.js";
 
 
 // CREATE PRODUCT --Admin Route
 export const createProduct = async (req, res, next) => {
     try {
-        // ASIGNING USER ID IN REQ.BODY.USER FEILD 
+        // ASIGNING USER ID IN REQ.BODY.USER FEILD
         req.body.user = req.user._id;
         const product = await Product.create(req.body);
         if(!product) {
@@ -25,9 +26,9 @@ export const createProduct = async (req, res, next) => {
 }
 
 
-// GET ALL PRODUCT 
+// GET ALL PRODUCT
 export const getAllProducts = async (req, res, next) => {
-    // BASIC PAGINATION 
+    // BASIC PAGINATION
     const page = req.query.page || 1;
     const maxProductPerPage = 3;
     const countDocument = await Product.countDocuments();
@@ -47,7 +48,7 @@ export const getAllProducts = async (req, res, next) => {
 }
 
 
-// GET A SINGLE PRODUCT 
+// GET A SINGLE PRODUCT
 export const getProductDetails = async (req, res, next) => {
     const { id } = req.params;
     try {
@@ -55,7 +56,7 @@ export const getProductDetails = async (req, res, next) => {
         if(!product) {
             return next(new ErrorHandler("product not found", 404));
         }
-        // IF PRODUCT EXIST 
+        // IF PRODUCT EXIST
         res.status(201).json({
             "success": true,
             product,
@@ -67,7 +68,7 @@ export const getProductDetails = async (req, res, next) => {
 
 
 
-// UPDATE PRODUCT 
+// UPDATE PRODUCT
 export const updateProduct = async (req, res) => {
     try {
         let product = await Product.findById(req.params.id);
@@ -77,7 +78,7 @@ export const updateProduct = async (req, res) => {
                 "message": "product not found"
             })
         }
-        
+
         product = await Product.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
         res.status(201).json({
             "success": true,
@@ -89,7 +90,7 @@ export const updateProduct = async (req, res) => {
 }
 
 
-// DELETE PRODUCT 
+// DELETE PRODUCT
 export const deleteProduct = async (req, res) => {
     const {id} = req.params;
     try {
@@ -112,13 +113,13 @@ export const deleteProduct = async (req, res) => {
 
 
 
-// CREATE REVIEW  
+// CREATE REVIEW
 // export const createReview = async (req, res, next) => {
 //     try {
 //         const { productId } = req.params;
 //         const userId = req.user._id;
 
-//         // CREATE PRODUCT REVIEW 
+//         // CREATE PRODUCT REVIEW
 //         const productReview = {
 //             user: userId,
 //             name: req.user.name,
@@ -128,8 +129,8 @@ export const deleteProduct = async (req, res) => {
 //         if(!product) {
 //             return next(new ErrorHandler("product not found", 400));
 //         }
-        
-//         // CHECK IF THE USER EXIST 
+
+//         // CHECK IF THE USER EXIST
 //         const userExist = product.reviews.find(rev => rev.user.toString() === userId.toString());
 //         if(!userExist) {
 //             product.reviews.push(productReview);
@@ -144,14 +145,14 @@ export const deleteProduct = async (req, res) => {
 //         }
 
 
-//         // CHANGE THE OVARAL RATING  
+//         // CHANGE THE OVARAL RATING
 //         let avg = 0;
 //         product.reviews.forEach(rev => {
 //             avg = avg + rev.rating;
 //         })
 //         product.ratings = avg/product.reviews.length;
-        
-//         // NOW SAVE THE REVIEW 
+
+//         // NOW SAVE THE REVIEW
 //         await product.save();
 
 //         const message = userExist ? "review updated successfully" : "review addded successfully";
@@ -164,7 +165,7 @@ export const deleteProduct = async (req, res) => {
 //     }
 // }
 
-// CREATE REVIEW  
+// CREATE REVIEW
 export const createReview = async (req, res, next) => {
     try {
         const { productId, rating, comment } = req.body;
@@ -180,8 +181,8 @@ export const createReview = async (req, res, next) => {
             return next(new ErrorHandler("product not found", 404));
         }
 
-        // // CHECK IF USER ALLREADY HAVE ANY REVIEW TO THIS PRODUCT 
-        
+        // // CHECK IF USER ALLREADY HAVE ANY REVIEW TO THIS PRODUCT
+
         const isReviewed = product.reviews.find(rev => rev.user.toString() === userId.toString());
         if(!isReviewed) {
             console.log("1")
@@ -195,16 +196,16 @@ export const createReview = async (req, res, next) => {
                 }
             })
         }
-        // CALCULATE THE NUMBER OF REVIEWS 
+        // CALCULATE THE NUMBER OF REVIEWS
         product.numOfReviews = product.reviews.length;
-        
-        // CALCULATE THE OVARAL RATINGS  
+
+        // CALCULATE THE OVARAL RATINGS
         let avg = 0;
         product.reviews.forEach(rev => {
             avg = avg + rev.rating;
         })
         product.ratings = avg/product.reviews.length;
-            
+
         await product.save();
         const message = isReviewed ? "product updated successfully" : "product added successfully";
         res.status(200).json({
@@ -217,7 +218,7 @@ export const createReview = async (req, res, next) => {
 }
 
 
-// GET ALL REVIEWS OF PRODUCT  
+// GET ALL REVIEWS OF PRODUCT
 export const getAllReviews = async (req, res, next) => {
     try {
         const { productId } = req.query;
@@ -236,7 +237,7 @@ export const getAllReviews = async (req, res, next) => {
 }
 
 
-// DELETEE REVIEW 
+// DELETEE REVIEW
 export const deleteReview = async (req, res, next) => {
     try {
         const { productId } = req.query;
@@ -244,16 +245,73 @@ export const deleteReview = async (req, res, next) => {
         if(!product) {
             return next(new ErrorHandler("product not found", 404));
         }
-        // FILTER THE USER REVIEW 
+        // FILTER THE USER REVIEW
         product.reviews = product.reviews.filter(rev => rev.user.toString() !== req.user._id.toString());
 
-        // NOW SAVE THE PRODUCT 
+        // NOW SAVE THE PRODUCT
         await product.save();
         res.status(200).json({
             success: true,
             message: "review deleted successfully",
         })
     } catch (error) {
-       next(error); 
+       next(error);
     }
+}
+
+
+
+// PRODUCT ADD TO CART
+export const addToCart = async (req, res, next) => {
+  try{
+    const {id, quantity} = req.body;
+    const user = await UserModel.findById(req.user._id);
+    // IF USER NOT EXIST 
+    if(!user) {
+        return next(new ErrorHandler("user not found", 404))
+    }
+
+    // IF PRODUCT NOT EXIST 
+    const product = await Product.findById(id);
+    if(!product) {
+        return next(new ErrorHandler("product not found", 404))
+    }
+    // check if the product exist in cart if so than replace it if not than add it 
+    if(user.cart.length > 0) {
+        let isExist = false;
+        let index = 0;
+
+        // CHECK IF THE PRODUCT EXIST 
+        user.cart.forEach((cart, i) => {
+            if(id === cart.product._id.toString()) {
+                isExist = true;
+                index = i;
+            }
+        })
+
+        // NOW DO THE REPLACE OR ADD OPERATION 
+        if(isExist) {
+            user.cart[index] = {product, quantity}
+        }
+        else {
+            user.cart.push({product, quantity})
+        }
+
+
+    }
+    else {
+        user.cart.push({product, quantity});
+    }
+
+  
+    // SAVE THE USER CART  
+    await user.save();
+    res.json({
+        success: true,
+        message: "product added to cart"
+    })
+  }
+  catch(error) {
+    next(error);
+  }
 }
