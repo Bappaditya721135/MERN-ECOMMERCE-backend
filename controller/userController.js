@@ -4,16 +4,16 @@ import jwt from "jsonwebtoken";
 import ErrorHandler from "../utils/errorHandlerClass.js";
 import crypto from "crypto";
 
-// SEND COOKIE UTILITY FUNCTION 
+// SEND COOKIE UTILITY FUNCTION
 import { sendCookie } from "../utils/sendCookie.js";
 import { sendEamil } from "../utils/sendEmail.js";
 
-// USER REGISTATION 
+// USER REGISTATION
 export const registerUser = async (req, res, next) => {
     try {
         const user = await UserModel.create(req.body);
 
-        // IF SOMETHING WENT WRONG WHILE CREATING USER IN DATA BASE 
+        // IF SOMETHING WENT WRONG WHILE CREATING USER IN DATA BASE
         if(!user) return next(new ErrorHandler("something went wrong while creating the user", 500))
 
         sendCookie(user, 201, res);
@@ -23,21 +23,21 @@ export const registerUser = async (req, res, next) => {
 }
 
 
-// USER LOGIN 
+// USER LOGIN
 export const loginUser = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         if(!email || !password) return next(new ErrorHandler("enter email & password", 400))
         const user = await UserModel.findOne({email}).select("+password")
 
-        // USER NOT FOUND 
+        // USER NOT FOUND
         if(!user) return next(new ErrorHandler("can not find user", 404));
 
-        // CHECK IF THE PASSWORD MATCH 
+        // CHECK IF THE PASSWORD MATCH
         const isPasswordCorrect = await user.comparePassword(password);
         if(!isPasswordCorrect) return next(new ErrorHandler("invalid email or password", 400));
-        
-        // SEND COOKIE 
+
+        // SEND COOKIE
         sendCookie(user,201, res);
     } catch (error) {
         next(error)
@@ -45,7 +45,7 @@ export const loginUser = async (req, res, next) => {
 }
 
 
-// GET USER  
+// GET USER
 export const getUser = (req, res, next) => {
     try {
         sendCookie(req.user, 201, res);
@@ -55,7 +55,7 @@ export const getUser = (req, res, next) => {
 }
 
 
-// LOGOUT USER 
+// LOGOUT USER
 export const logoutUser = (req, res, next) => {
     try {
         res.status(201).cookie(
@@ -67,16 +67,16 @@ export const logoutUser = (req, res, next) => {
              message: "logout successfull"
             });
     } catch (error) {
-      next(error);  
+      next(error);
     }
 }
 
 
-// FORGOR PASSWORD 
+// FORGOR PASSWORD
 export const forgotPassword = async (req, res, next) => {
         const { email } = req.body;
         const user = await UserModel.findOne({ email });
-        // CHECK IF USER EXIST 
+        // CHECK IF USER EXIST
         if(!user) {
             return next(new ErrorHandler("user not exist", 404));
         }
@@ -104,7 +104,7 @@ export const forgotPassword = async (req, res, next) => {
 }
 
 
-// RESET PASSWORD 
+// RESET PASSWORD
 export const resetPassword = async (req, res, next) => {
     try {
         const { token } = req.params;
@@ -114,12 +114,12 @@ export const resetPassword = async (req, res, next) => {
             resetPasswordToken: encryptedToken,
             resetTokenExpire: {$gt: Date.now()}
         });
-        // IF USER NOT FOUND 
+        // IF USER NOT FOUND
         if(!user) {
-            return next(new ErrorHandler("invalid reset token or reset token has expired", 400)); 
+            return next(new ErrorHandler("invalid reset token or reset token has expired", 400));
         }
 
-        // IF PASSWORD AND CONFIRM PASSWORD NOT MATCHED 
+        // IF PASSWORD AND CONFIRM PASSWORD NOT MATCHED
         if(req.body.password !== req.body.confirmPassword) {
             return next(new ErrorHandler("password and confirmPassword do not match", 400));
         }
@@ -137,24 +137,25 @@ export const resetPassword = async (req, res, next) => {
     }
 }
 
-// CHANGE PASSWORD 
+// CHANGE PASSWORD
 export const changePassword = async (req, res, next) => {
     try {
+      // console.log(req.body);
         const { originalPassword, newPassword, confirmPassword } = req.body;
         const user = await UserModel.findById(req.user._id).select("+password");
         if(!user) {
             return next(new ErrorHandler("user not found", 400));
         }
-        // FIRST CHECK IF THE NEW PASSWORD AND CONFIRST PASSWORD ARE CORRECT BEFORE CHECKING THE ORIGINAL PASSWORD 
+        // FIRST CHECK IF THE NEW PASSWORD AND CONFIRST PASSWORD ARE CORRECT BEFORE CHECKING THE ORIGINAL PASSWORD
         if(newPassword !== confirmPassword) {
             return next(new ErrorHandler("Check new password and confirm password", 400));
         }
-        // CHECK THE ORIGINAL PASSWORD 
+        // CHECK THE ORIGINAL PASSWORD
         if(!await bcrypt.compare(originalPassword, user.password)) {
             return next(new ErrorHandler("Invalid credentials", 400));
         }
 
-        // NOW CHANGE THE PASSWORD  
+        // NOW CHANGE THE PASSWORD
         user.password = newPassword;
         await user.save();
 
@@ -182,10 +183,10 @@ export const getAllUsers = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-} 
+}
 
 
-// GET SINGLE USER (--Admin) 
+// GET SINGLE USER (--Admin)
 export const getSingleUser = async (req, res, next) => {
     try {
         const {id} = req.params;
@@ -222,7 +223,7 @@ export const updateUser = async (req, res, next) => {
 }
 
 
-// DELETE USER (--Admin) 
+// DELETE USER (--Admin)
 export const deleteUser = async (req, res, next) => {
     try {
         const { id } = req.params;
