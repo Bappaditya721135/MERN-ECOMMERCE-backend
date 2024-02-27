@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
             required: true,
         }
     },
+    cart: [],
     role: {
         type: String,
         default: "user"

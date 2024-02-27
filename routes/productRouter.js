@@ -1,5 +1,5 @@
 import express from "express";
-import { createProduct, createReview, deleteProduct, deleteReview, getAllProducts, getAllReviews, getProductDetails, updateProduct } from "../controller/productController.js";
+import { createProduct, createReview, deleteProduct, deleteReview, getAllProducts, getAllReviews, getProductDetails, updateProduct, addToCart } from "../controller/productController.js";
 import { isAuthenticated } from "../middleware/isAuthenticated.js";
 import { isAuthorize } from "../middleware/isAuthorize.js";
 
@@ -10,7 +10,7 @@ export const productRouter = express.Router();
 
 
 
-// GET ALL PRODUCT ROUTES 
+// GET ALL PRODUCT ROUTES
 productRouter.route("/product").get(getAllProducts);
 
 
@@ -18,12 +18,19 @@ productRouter.route("/product").get(getAllProducts);
 productRouter.route("/product/new").post(isAuthenticated, isAuthorize("admin"), createProduct);
 
 
-// UPDATE PRODUCT --Admin Route 
+// PRODUCT ADD TO CART
+productRouter.route("/product/add-to-cart").post(isAuthenticated,addToCart)
+
+// UPDATE PRODUCT --Admin Route
 productRouter.route("/product/:id").get(getProductDetails).put(isAuthenticated, isAuthorize("admin"), updateProduct).delete(isAuthenticated, isAuthorize("admin"), deleteProduct);
 
 
-// CREATE REVIEW 
+// CREATE REVIEW
 productRouter.route("/review").post(isAuthenticated, createReview);
 
-// GET ALL REVIEWS AND DELETE REVIEW 
+// GET ALL REVIEWS AND DELETE REVIEW
 productRouter.route("/reviews").get(getAllReviews).delete(isAuthenticated, deleteReview);
+
+
+
+
