@@ -1,6 +1,6 @@
 import express from "express";
 // CONTROLLERS
-import { loginUser, logoutUser, registerUser, forgotPassword, resetPassword, getAllUsers, getSingleUser, updateUser, deleteUser, changePassword, getUser } from "../controller/userController.js";
+import { loginUser, logoutUser, registerUser, forgotPassword, resetPassword, getAllUsers, getSingleUser, updateUser, deleteUser, changePassword, getUser, myCart } from "../controller/userController.js";
 import { isAuthenticated } from "../middleware/isAuthenticated.js"
 import { isAuthorize } from "../middleware/isAuthorize.js";
 
@@ -20,6 +20,7 @@ userRouter.route("/forgot-password").post(forgotPassword);
 userRouter.route("/reset-password/:token").post(resetPassword);
 // CHANGE PASSWORD
 userRouter.route("/password/update").put(isAuthenticated, changePassword)
+userRouter.route("/my-cart").get(isAuthenticated, myCart);
 
 // GET ALL USER FOR (--ADMIN)
 userRouter.route("/admin/getallusers").get(isAuthenticated, isAuthorize("admin"), getAllUsers);
