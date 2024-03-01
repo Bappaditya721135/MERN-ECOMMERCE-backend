@@ -169,6 +169,20 @@ export const changePassword = async (req, res, next) => {
 }
 
 
+// GET USER CART 
+export const myCart = async (req, res, next) => {
+    try {
+        const cart = req.user.cart;
+        res.json({
+            success: true,
+            cart,
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 // GET ALL USER (--Admin)
 export const getAllUsers = async (req, res, next) => {
     try {
@@ -240,3 +254,7 @@ export const deleteUser = async (req, res, next) => {
         next(error);
     }
 }
+
+
+
+
