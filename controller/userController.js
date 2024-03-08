@@ -173,6 +173,8 @@ export const changePassword = async (req, res, next) => {
 export const myCart = async (req, res, next) => {
     try {
         const cart = req.user.cart;
+        let totalPrice = 0;
+        console.log(cart)
         res.json({
             success: true,
             cart,
@@ -180,6 +182,23 @@ export const myCart = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+}
+
+
+
+// DELETE ITEM FORM CART  
+export const deleteCartItem = async (req, res, next) => {
+    const {id} = req.params;
+    // console.log(req.user);
+    const user = req.user;
+
+    // NOW FILTER THE ITEM 
+    user.cart = user.cart.filter(obj => obj.product._id.toString() !== id);
+    await user.save();
+    res.json({
+        success: true,
+        message: "delete cart item"
+    })
 }
 
 
