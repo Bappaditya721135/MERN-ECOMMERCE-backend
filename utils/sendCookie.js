@@ -5,6 +5,9 @@ export const sendCookie = (user, statusCode, res) => {
     const cookieOption = {
         httpOnly: true,
         maxAge: process.env.MAX_AGE,
+        sameSite: "none",
+        secure: true,
+        credentials: true,
     }
 
     const token = user.getJWTToken();
