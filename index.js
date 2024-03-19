@@ -9,7 +9,14 @@ import { orderRouter } from "./routes/orderRouter.js";
 import { errorHandler } from "./middleware/error.js";
 import cookieParser from "cookie-parser";
 
+import cors from "cors";
+
 const app = express();
+
+app.use(cors({
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"]
+}))
 
 // UNCAUGHT express error s
 process.on("uncaughtException", (err) => {
