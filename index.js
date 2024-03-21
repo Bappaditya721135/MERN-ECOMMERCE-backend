@@ -19,6 +19,8 @@ app.get("/", (req, res) => {
     })
 })
 
+
+// THIS IS CORS  in express 
 app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
