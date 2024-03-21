@@ -21,7 +21,8 @@ app.get("/", (req, res) => {
 
 app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type"]
+    allowedHeaders: ["Content-Type"],
+    credentials: true,
 }))
 
 // UNCAUGHT express error s
