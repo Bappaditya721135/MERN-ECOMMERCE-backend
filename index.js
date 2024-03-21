@@ -12,6 +12,12 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 const app = express();
+app.get("/", (req, res) => {
+    res.json({
+        success: true,
+        message: "this is the / page"
+    })
+})
 
 app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"],
