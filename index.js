@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 
 // THIS IS CORS  in express 
 app.use(cors({
-    origin: "https://65fd2ea53365dfddd64aee22--startling-bubblegum-cbab19.netlify.app",
+    origin: "https://startling-bubblegum-cbab19.netlify.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
