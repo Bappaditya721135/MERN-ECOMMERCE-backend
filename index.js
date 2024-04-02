@@ -12,21 +12,37 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 const app = express();
-app.get("/", (req, res) => {
-    res.json({
-        success: true,
-        message: "this is the / page"
-    })
+
+
+
+
+// MIDDLEWARE 
+app.use(express.json());
+app.use(cookieParser());
+// // THIS IS CORS  in express 
+// app.use(cors({
+//     origin: "https://startling-bubblegum-cbab19.netlify.app",
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     allowedHeaders: ["Content-Type"],
+//     credentials: true,
+// }))
+
+// PATH FOR ENV VARIABLES 
+dotenv.config({
+    path: "config/config.env",
 })
 
+// ROUTES 
+app.use("/api/v1", productRouter);
+app.use("/api/v1", userRouter);
 
-// THIS IS CORS  in express 
-app.use(cors({
-    origin: "https://startling-bubblegum-cbab19.netlify.app",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type"],
-    credentials: true,
-}))
+app.use("/api/v1", orderRouter);
+
+// CONNECTING TO DATABASE 
+connect_DB();
+
+
+
 
 // UNCAUGHT express error s
 process.on("uncaughtException", (err) => {
@@ -37,26 +53,16 @@ process.on("uncaughtException", (err) => {
 
 
 
-// PATH FOR ENV VARIABLES 
-dotenv.config({
-    path: "config/config.env",
+
+
+
+app.get("/", (req, res) => {
+    res.json({
+        success: true,
+        message: "this is the / page"
+    })
 })
 
-
-
-
-// MIDDLEWARE 
-app.use(express.json());
-app.use(cookieParser());
-
-
-// ROUTES 
-app.use("/api/v1", productRouter);
-app.use("/api/v1", userRouter);
-
-app.use("/api/v1", orderRouter);
-// CONNECTING TO DATABASE 
-connect_DB();
 
 
 const server = app.listen(process.env.PORT, () => {

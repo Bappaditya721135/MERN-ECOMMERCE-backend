@@ -2,12 +2,12 @@ import jwt from "jsonwebtoken";
 
 
 export const sendCookie = (user, statusCode, res) => {
+    const cookieValidity = process.env.COOKIE_VALIDITY * 24 * 60 * 60 * 1000;
     const cookieOption = {
         httpOnly: true,
-        maxAge: process.env.MAX_AGE,
-        sameSite: "none",
-        secure: true,
-        credentials: true,
+        maxAge: cookieValidity,
+        sameSite: true,
+
     }
 
     const token = user.getJWTToken();

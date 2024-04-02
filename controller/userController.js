@@ -171,10 +171,11 @@ export const changePassword = async (req, res, next) => {
 
 // GET USER CART 
 export const myCart = async (req, res, next) => {
+    console.log("my cart")
+    console.log(req.user)
     try {
         const cart = req.user.cart;
         let totalPrice = 0;
-        console.log(cart)
         res.json({
             success: true,
             cart,
