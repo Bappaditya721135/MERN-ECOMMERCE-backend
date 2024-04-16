@@ -20,7 +20,7 @@ const app = express();
 // MIDDLEWARE 
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static("dist"))
+app.use(express.static(path.resolve("./dist")))
 // // THIS IS CORS  in express 
 // app.use(cors({
 //     origin: "https://startling-bubblegum-cbab19.netlify.app",
@@ -62,11 +62,17 @@ app.get("/", (req, res) => {
 })
 
 
-
 app.get("*", (req, res) => {
     const abPath = path.resolve("./dist/index.html")
     res.sendFile(abPath)
 })
+// app.get("/hehe", (req, res) => {
+    // console.log("this is / url")
+    // const abPath = path.resolve("./dist/index.html");
+    // console.log(abPath);
+    // res.sendFile(abPath)
+//     res.send("hello world")
+// })
 
 
 
