@@ -8,6 +8,7 @@ import { userRouter } from "./routes/userRouter.js";
 import { orderRouter } from "./routes/orderRouter.js";
 import { errorHandler } from "./middleware/error.js";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 import cors from "cors";
 
@@ -19,6 +20,7 @@ const app = express();
 // MIDDLEWARE 
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static("dist"))
 // // THIS IS CORS  in express 
 // app.use(cors({
 //     origin: "https://startling-bubblegum-cbab19.netlify.app",
@@ -56,11 +58,9 @@ process.on("uncaughtException", (err) => {
 
 
 
-app.get("/", (req, res) => {
-    res.json({
-        success: true,
-        message: "this is the / page"
-    })
+app.get("*", (req, res) => {
+    const abPath = path.resolve("./dist/index.html")
+    res.sendFile(abPath)
 })
 
 
