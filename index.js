@@ -56,6 +56,11 @@ process.on("uncaughtException", (err) => {
 
 
 
+app.get("/", (req, res) => {
+    const abPath = path.resolve("./dist/index.html")
+    res.sendFile(abPath)
+})
+
 
 
 app.get("*", (req, res) => {
