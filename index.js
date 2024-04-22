@@ -10,7 +10,6 @@ import { errorHandler } from "./middleware/error.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 
-import cors from "cors";
 
 const app = express();
 
@@ -21,13 +20,6 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.resolve("./dist")))
-// // THIS IS CORS  in express 
-// app.use(cors({
-//     origin: "https://startling-bubblegum-cbab19.netlify.app",
-//     methods: ["GET", "POST", "PUT", "DELETE"],
-//     allowedHeaders: ["Content-Type"],
-//     credentials: true,
-// }))
 
 // PATH FOR ENV VARIABLES 
 dotenv.config({
@@ -66,13 +58,7 @@ app.get("*", (req, res) => {
     const abPath = path.resolve("./dist/index.html")
     res.sendFile(abPath)
 })
-// app.get("/hehe", (req, res) => {
-    // console.log("this is / url")
-    // const abPath = path.resolve("./dist/index.html");
-    // console.log(abPath);
-    // res.sendFile(abPath)
-//     res.send("hello world")
-// })
+
 
 
 
