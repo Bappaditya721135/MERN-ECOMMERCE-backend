@@ -38,6 +38,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "user"
     },
+    authToken: String,
+    authTokenExpiresInMiliSeconds: Date,
     resetPasswordToken: String,
     resetTokenExpire: Date,
 })
@@ -52,8 +54,12 @@ userSchema.pre("save", async function (next) {
 })
 
 // GENERATE TOKEN 
-userSchema.methods.getJWTToken = function() {
-    return jwt.sign({id: this._id}, process.env.JWT_SECRECT_KEY);
+userSchema.methods.getJWTToken = async function(cookie_validity_miliseconds) {
+    const token = jwt.sign({id: this._id}, process.env.JWT_SECRECT_KEY);
+    this.authToken = token;
+    this.authTokenExpiresInMiliSeconds = cookie_validity_miliseconds;
+    await this.save();
+    return token;
 }
 
 // CHECK IF THE ENTERED PASSWORD IS CORRECT 

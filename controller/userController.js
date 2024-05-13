@@ -5,7 +5,7 @@ import ErrorHandler from "../utils/errorHandlerClass.js";
 import crypto from "crypto";
 
 // SEND COOKIE UTILITY FUNCTION
-import { sendCookie } from "../utils/sendCookie.js";
+import { sendCookie, sendExistingCookie } from "../utils/sendCookie.js";
 import { sendEamil } from "../utils/sendEmail.js";
 
 // USER REGISTATION
@@ -16,7 +16,7 @@ export const registerUser = async (req, res, next) => {
         // IF SOMETHING WENT WRONG WHILE CREATING USER IN DATA BASE
         if(!user) return next(new ErrorHandler("something went wrong while creating the user", 500))
 
-        sendCookie(user, 201, res);
+        await sendCookie(user, 201, res);
     } catch (error) {
         next(error)
     }
@@ -38,7 +38,7 @@ export const loginUser = async (req, res, next) => {
         if(!isPasswordCorrect) return next(new ErrorHandler("invalid email or password", 400));
 
         // SEND COOKIE
-        sendCookie(user,201, res);
+        await sendCookie(user,201, res);
     } catch (error) {
         next(error)
     }
@@ -48,7 +48,7 @@ export const loginUser = async (req, res, next) => {
 // GET USER
 export const getUser = (req, res, next) => {
     try {
-        sendCookie(req.user, 201, res);
+        sendExistingCookie(req.user, 200, res)
     } catch (error) {
         next(error)
     }
@@ -59,7 +59,7 @@ export const getUser = (req, res, next) => {
 export const logoutUser = (req, res, next) => {
     try {
         res.status(201).cookie(
-            "token", null,
+            "authToken", null,
              {
                 expires: new Date(Date.now())
             }).json({
@@ -128,6 +128,11 @@ export const resetPassword = async (req, res, next) => {
         user.resetPasswordToken = undefined;
         user.resetTokenExpire = undefined;
         await user.save();
+        await sendEamil({
+            email: user.email,
+            subject: "Ecommerce password reset",
+            message: "Your password for E-commerse was updated successfully."
+        })
         res.json({
             success: true,
             message: "password changed successfully",
