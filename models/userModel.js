@@ -3,6 +3,7 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import otpGenerator from "otp-generator"
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -40,8 +41,8 @@ const userSchema = new mongoose.Schema({
     },
     authToken: String,
     authTokenExpiresInMiliSeconds: Date,
-    resetPasswordToken: String,
-    resetTokenExpire: Date,
+    resetPasswordOtp: String,
+    resetOtpExpires: Date,
 })
 
 // ENCRYPT PASSWORD  
@@ -68,13 +69,17 @@ userSchema.methods.comparePassword = async function(password) {
 }
 
 // GET RESET PASSWORD TOKEN 
-userSchema.methods.getResetPasswordToken = function () {
-    const resetToken = crypto.randomBytes(20).toString("hex");
-
-    this.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-    this.resetTokenExpire = Date.now() + 15 * 60 * 1000;
-
-    return resetToken;
+userSchema.methods.getResetPasswordOtp = async function () {
+    const otp = otpGenerator.generate(6, {
+        upperCaseAlphabets: false, 
+        lowerCaseAlphabets: false, 
+        specialChars: false, 
+        digits: true,
+    })
+    this.resetPasswordOtp = otp;
+    this.resetOtpExpires = new Date(Date.now() + 15 * 60 * 1000)
+    this.save()
+    return otp;
 }
 
 export const UserModel = mongoose.model("Users", userSchema);
