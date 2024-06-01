@@ -82,10 +82,8 @@ export const forgotPassword = async (req, res, next) => {
         }
 
     try {
-        const resetToken = user.getResetPasswordToken();
-        await user.save();
-        const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/reset-password/${resetToken}`;
-        const message = `please reset your password from this url:- ${resetPasswordUrl} if not requested from you ignore it`;
+        const otp = await user.getResetPasswordOtp();
+        const message = `Your one-time-password fro your password reset is ${otp}. This otp is valid for 15 minites.`;
         await sendEamil({
             email: user.email,
             subject: "Ecommerce password reset",
@@ -93,11 +91,11 @@ export const forgotPassword = async (req, res, next) => {
         })
         res.status(200).json({
             success: true,
-            message: `reset token url sent to ${user.email}`
+            message: `password reset otp has been sent to ${user.email}`
         })
     } catch (error) {
-        user.resetPasswordToken = undefined;
-        user.resetTokenExpire = undefined;
+        user.resetPasswordOtp = undefined;
+        user.resetOtpExpire = undefined;
         await user.save();
         next(error);
     }
@@ -107,12 +105,9 @@ export const forgotPassword = async (req, res, next) => {
 // RESET PASSWORD
 export const resetPassword = async (req, res, next) => {
     try {
-        const { token } = req.params;
-        const { password } = req.body;
-        const encryptedToken = crypto.createHash("sha256").update(token).digest("hex");
+        const { email, password, confirmPassword, otp } = req.body;
         const user = await UserModel.findOne({
-            resetPasswordToken: encryptedToken,
-            resetTokenExpire: {$gt: Date.now()}
+            email
         });
         // IF USER NOT FOUND
         if(!user) {
@@ -120,13 +115,19 @@ export const resetPassword = async (req, res, next) => {
         }
 
         // IF PASSWORD AND CONFIRM PASSWORD NOT MATCHED
-        if(req.body.password !== req.body.confirmPassword) {
+        if(req.body.password !== confirmPassword) {
             return next(new ErrorHandler("password and confirmPassword do not match", 400));
+        }
+        console.log(user.resetOtpExpires);
+        console.log(new Date(Date.now()))
+
+        if(user.resetPasswordOtp !== otp.toString() || user.resetOtpExpires < new Date(Date.now())) {
+            return next(new ErrorHandler("otp not valid", 400))
         }
 
         user.password = password;
-        user.resetPasswordToken = undefined;
-        user.resetTokenExpire = undefined;
+        user.resetPasswordOtp = undefined;
+        user.resetOtpExpire = undefined;
         await user.save();
         await sendEamil({
             email: user.email,
