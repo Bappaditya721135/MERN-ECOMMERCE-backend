@@ -17,7 +17,7 @@ userRouter.route("/logout").get(logoutUser);
 // FORGOT PASSWORD
 userRouter.route("/forgot-password").post(forgotPassword);
 // RESET PASSWORD
-userRouter.route("/reset-password/:token").post(resetPassword);
+userRouter.route("/reset-password").post(resetPassword);
 // CHANGE PASSWORD
 userRouter.route("/password/update").put(isAuthenticated, changePassword)
 
