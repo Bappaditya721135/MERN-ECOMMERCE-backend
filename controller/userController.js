@@ -10,6 +10,8 @@ import { sendEamil } from "../utils/sendEmail.js";
 
 // USER REGISTATION
 export const registerUser = async (req, res, next) => {
+    console.log("register user");
+    console.log(req.body);
     try {
         const user = await UserModel.create(req.body);
 
@@ -18,6 +20,7 @@ export const registerUser = async (req, res, next) => {
 
         await sendCookie(user, 201, res);
     } catch (error) {
+        console.log(error)
         next(error)
     }
 }
@@ -31,7 +34,7 @@ export const loginUser = async (req, res, next) => {
         const user = await UserModel.findOne({email}).select("+password")
 
         // USER NOT FOUND
-        if(!user) return next(new ErrorHandler("can not find user", 404));
+        if(!user) return next(new ErrorHandler("user not found", 404));
 
         // CHECK IF THE PASSWORD MATCH
         const isPasswordCorrect = await user.comparePassword(password);
