@@ -31,7 +31,7 @@ export const loginUser = async (req, res, next) => {
         const user = await UserModel.findOne({email}).select("+password")
 
         // USER NOT FOUND
-        if(!user) return next(new ErrorHandler("can not find user", 404));
+        if(!user) return next(new ErrorHandler("user not found", 404));
 
         // CHECK IF THE PASSWORD MATCH
         const isPasswordCorrect = await user.comparePassword(password);
@@ -118,8 +118,6 @@ export const resetPassword = async (req, res, next) => {
         if(req.body.password !== confirmPassword) {
             return next(new ErrorHandler("password and confirmPassword do not match", 400));
         }
-        console.log(user.resetOtpExpires);
-        console.log(new Date(Date.now()))
 
         if(user.resetPasswordOtp !== otp.toString() || user.resetOtpExpires < new Date(Date.now())) {
             return next(new ErrorHandler("otp not valid", 400))
@@ -146,7 +144,6 @@ export const resetPassword = async (req, res, next) => {
 // CHANGE PASSWORD
 export const changePassword = async (req, res, next) => {
     try {
-      // console.log(req.body);
         const { originalPassword, newPassword, confirmPassword } = req.body;
         const user = await UserModel.findById(req.user._id).select("+password");
         if(!user) {
@@ -177,8 +174,6 @@ export const changePassword = async (req, res, next) => {
 
 // GET USER CART 
 export const myCart = async (req, res, next) => {
-    console.log("my cart")
-    console.log(req.user)
     try {
         const cart = req.user.cart;
         let totalPrice = 0;
@@ -196,7 +191,6 @@ export const myCart = async (req, res, next) => {
 // DELETE ITEM FORM CART  
 export const deleteCartItem = async (req, res, next) => {
     const {id} = req.params;
-    // console.log(req.user);
     const user = req.user;
 
     // NOW FILTER THE ITEM 
